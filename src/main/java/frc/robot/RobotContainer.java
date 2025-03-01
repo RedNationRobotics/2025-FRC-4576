@@ -21,15 +21,21 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.Motor;
 import frc.robot.Libaries.LimelightHelpers;
 import frc.robot.Subsystems.Swerve_Drives;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.robot.Commands.NormalDrive;
+import frc.robot.Subsystems.swerve_drive;
 
 public class RobotContainer  {
   
-  
-  
   CommandXboxController driverController = new CommandXboxController(0);
-  Swerve_Drives drive = new Swerve_Drives();
+  swerve_Drive drive;
   
-  public RobotContainer() {
+  public RobotContainer(Swerve_Drive drive) {
+    this.drive = drive;
     configureBindings();
     initSmartDashboard();
   }
@@ -62,13 +68,10 @@ public class RobotContainer  {
     SmartDashboard.putNumber("Target Angle X", LimelightHelpers.getTY("limelight"));
     SmartDashboard.putNumber("Target Angle Y", LimelightHelpers.getTX("limelight"));
     SmartDashboard.putNumber("Area", LimelightHelpers.getTA("limelight"));
-
   }
 
-  //public Command getTeleopCommand(Object robot_drive){
-  //  return new RunCommand(()->robot_drive.drive(driverController.getLeftY(), driverController.getLeftX(), driverController.getRightX()), robot_drive);
-  //}
+  public Command getTelaopCommand(swerve_drive drive) {
+    //return new NormalDrive(driveController, drive);
+    return new RunCommand(() -> drive.drive(MathUtil.applyDeadband(MathUtil.clamp(driveController.getLeftY(), -0.5, 0.5),.1), MathUtil.applyDeadband(MathUtil.clamp(driveController.getLeftX(), -0.5, 0.5),.1), MathUtil.applyDeadband(MathUtil.clamp(driveController.getRightX(), -1, 1),.1)), drive);
+  }
 }
-
-
-
