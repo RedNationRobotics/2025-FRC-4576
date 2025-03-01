@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.Motor;
 import frc.robot.Libaries.LimelightHelpers;
-import frc.robot.Subsystems.Swerve_Drives;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,9 +31,9 @@ import frc.robot.Subsystems.swerve_drive;
 public class RobotContainer  {
   
   CommandXboxController driverController = new CommandXboxController(0);
-  swerve_Drive drive;
+  swerve_drive drive;
   
-  public RobotContainer(Swerve_Drive drive) {
+  public RobotContainer(swerve_drive drive) {
     this.drive = drive;
     configureBindings();
     initSmartDashboard();
@@ -72,6 +71,6 @@ public class RobotContainer  {
 
   public Command getTelaopCommand(swerve_drive drive) {
     //return new NormalDrive(driveController, drive);
-    return new RunCommand(() -> drive.drive(MathUtil.applyDeadband(MathUtil.clamp(driveController.getLeftY(), -0.5, 0.5),.1), MathUtil.applyDeadband(MathUtil.clamp(driveController.getLeftX(), -0.5, 0.5),.1), MathUtil.applyDeadband(MathUtil.clamp(driveController.getRightX(), -1, 1),.1)), drive);
+    return new RunCommand(() -> drive.drive(MathUtil.applyDeadband(MathUtil.clamp(driverController.getLeftY(), -0.5, 0.5),.1), MathUtil.applyDeadband(MathUtil.clamp(driverController.getLeftX(), -0.5, 0.5),.1), MathUtil.applyDeadband(MathUtil.clamp(driverController.getRightX(), -1, 1),.1)), drive);
   }
 }

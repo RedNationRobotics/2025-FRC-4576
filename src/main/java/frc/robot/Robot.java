@@ -37,7 +37,7 @@ public class Robot extends TimedRobot {
   private swerve_drive robot_drive = new swerve_drive();
 
   public Robot() {
-    m_robotContainer = new RobotContainer();
+    m_robotContainer = new RobotContainer(robot_drive);
 
     // This resets the motors to 0 (It should at least, not 100% sure yet)
     Constants.SWERVE_MOTORS.Swerve_BL.resetEncoders();
