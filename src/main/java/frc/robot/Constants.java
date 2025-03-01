@@ -1,7 +1,5 @@
 package frc.robot;
 
-//import org.opencv.core.Mat;
-
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -55,6 +53,7 @@ public class Constants {
     }
 
     public static final class ModuleConstants {
+        // Calculations required for driving motor conversion factors and feed forward
         public static final double kFreeSpeedRpm = 5767;
         // The MAXSwerve module can be configured with one of three pinion gears: 12T, 13T, or 14T.
         // This changes the drive speed of the module (a pinion gear with more teeth will result in a
@@ -65,6 +64,7 @@ public class Constants {
         // Invert the turning encoder, since the output shaft rotates in the opposite direction of
         // the steering motor in the MAXSwerve Module.
         public static final boolean kTurningEncoderInverted = true;
+      
         // Calculations required for driving motor conversion factors and feed forward
         public static final double kDrivingMotorFreeSpeedRps = kFreeSpeedRpm / 60;
         public static final double kWheelDiameterMeters = 0.0762;

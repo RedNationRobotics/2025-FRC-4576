@@ -4,6 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Commands.Motor;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -23,6 +33,7 @@ public class Robot extends TimedRobot {
   private Command m_teleopCommand;
 
   private final RobotContainer m_robotContainer;
+
   private swerve_drive robot_drive = new swerve_drive();
 
   public Robot() {
@@ -38,6 +49,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    m_robotContainer.getLimelightValues();
   }
 
   @Override
@@ -72,6 +84,7 @@ TalonSRX motor = new TalonSRX(17);
       m_autonomousCommand.cancel();
     }
 
+
     m_teleopCommand = m_robotContainer.getTelaopCommand(robot_drive);
     robot_drive.setDefaultCommand((m_teleopCommand));
     XboxController c = new XboxController(0);
@@ -83,6 +96,7 @@ TalonSRX motor = new TalonSRX(17);
 
   @Override
   public void teleopPeriodic() {
+    SmartDashboard.putNumber("teleopPeriodic", kDefaultPeriod);
     SmartDashboard.putNumber("Gyro Rot:", Constants.gyro.main_Gyro.getRotation2d().getDegrees());
   }
 
@@ -92,6 +106,7 @@ TalonSRX motor = new TalonSRX(17);
   @Override
   public void testInit() {
     CommandScheduler.getInstance().cancelAll();
+
     //TalonSRX motor = new TalonSRX(17);
     TalonSRX motor = new TalonSRX(17);
     motor.set(TalonSRXControlMode.PercentOutput, 1);

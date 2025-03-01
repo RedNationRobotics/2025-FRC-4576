@@ -4,6 +4,23 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Commands.Motor;
+import frc.robot.Libaries.LimelightHelpers;
+import frc.robot.Subsystems.Swerve_Drives;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -12,23 +29,49 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Commands.NormalDrive;
 import frc.robot.Subsystems.swerve_drive;
 
-public class RobotContainer {
-  public RobotContainer() {
+public class RobotContainer  {
+  
+  CommandXboxController driverController = new CommandXboxController(0);
+  swerve_Drive drive;
+  
+  public RobotContainer(Swerve_Drive drive) {
+    this.drive = drive;
     configureBindings();
+    initSmartDashboard();
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+
+    DigitalInput end = new DigitalInput(0);
+    DigitalInput orgin = new DigitalInput(1);
+    TalonSRX talon = new TalonSRX(17);
+    VictorSPX victor = new VictorSPX(0);
+    victor.set(ControlMode.PercentOutput, 1);
+    driverController.a().onTrue(new Motor(end, orgin, talon));
+    //driverController.a().onTrue(new RunCommand(() -> System.out.println("A pressed"), Swerve_Drives()));
+  }
+
+  private void configureLimelight() {
+
+  }
+
+  private void initSmartDashboard(){
+    SmartDashboard.putString("Test", "Some String Here");
+    SmartDashboard.putNumber( "YUUU",1200);
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
   }
 
+  public void getLimelightValues(){
+    SmartDashboard.putNumber("Target Angle X", LimelightHelpers.getTY("limelight"));
+    SmartDashboard.putNumber("Target Angle Y", LimelightHelpers.getTX("limelight"));
+    SmartDashboard.putNumber("Area", LimelightHelpers.getTA("limelight"));
+  }
 
-  XboxController driveController = new XboxController(0);
   public Command getTelaopCommand(swerve_drive drive) {
     //return new NormalDrive(driveController, drive);
     return new RunCommand(() -> drive.drive(MathUtil.applyDeadband(MathUtil.clamp(driveController.getLeftY(), -0.5, 0.5),.1), MathUtil.applyDeadband(MathUtil.clamp(driveController.getLeftX(), -0.5, 0.5),.1), MathUtil.applyDeadband(MathUtil.clamp(driveController.getRightX(), -1, 1),.1)), drive);
   }
 }
-
-
