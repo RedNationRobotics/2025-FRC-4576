@@ -7,12 +7,12 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.ctre.phoenix6.hardware.TalonFX;
+//import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+/*import edu.wpi.first.wpilibj.XboxController;
+*import edu.wpi.first.wpilibj.motorcontrol.Talon;
+*import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;*/
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -21,11 +21,16 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.Motor;
 import frc.robot.Libaries.LimelightHelpers;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import frc.robot.Commands.NormalDrive;
+import edu.wpi.first.math.geometry.Pose3d;
+/*import edu.wpi.first.networktables.NetworkTable;
+*import edu.wpi.first.networktables.NetworkTableEntry;
+*import edu.wpi.first.networktables.NetworkTableInstance;
+*import edu.wpi.first.networktables.NetworkTablesJNI;
+*import edu.wpi.first.wpilibj.XboxController;
+*import edu.wpi.first.wpilibj2.command.Command;
+*import edu.wpi.first.wpilibj2.command.Commands;
+*import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.robot.Commands.NormalDrive;*/
 import frc.robot.Subsystems.swerve_drive;
 
 public class RobotContainer  {
@@ -51,7 +56,6 @@ public class RobotContainer  {
   }
 
   private void configureLimelight() {
-
   }
 
   private void initSmartDashboard(){
@@ -60,16 +64,35 @@ public class RobotContainer  {
   }
 
   public Command getAutonomousCommand() {
+    
+
     return Commands.print("No autonomous command configured");
   }
 
   public void getLimelightValues(){
-    SmartDashboard.putNumber("Target Angle X", LimelightHelpers.getTY("limelight"));
-    SmartDashboard.putNumber("Target Angle Y", LimelightHelpers.getTX("limelight"));
-    SmartDashboard.putNumber("Area", LimelightHelpers.getTA("limelight"));
+      SmartDashboard.putNumber("Target Angle X", LimelightHelpers.getTY("limelight"));
+      SmartDashboard.putNumber("Target Angle Y", LimelightHelpers.getTX("limelight"));
+      Pose3d pose = LimelightHelpers.getTargetPose3d_RobotSpace("limelight");
+      SmartDashboard.putNumber("Target X?", pose.getX());
+      SmartDashboard.putNumber("Target Y?", pose.getY());
+      SmartDashboard.putNumber("Area", LimelightHelpers.getTA("limelight"));
   }
 
-  public Command getTelaopCommand(swerve_drive drive) {
+  public void getLimelightNTDouble(){
+
+    //Target x and Target y will be pulled from LimelightHelpers
+    double tx = LimelightHelpers.getTX("limelight");
+    double ty = LimelightHelpers.getTY("limelight");
+
+   
+    double Tangent = tx / ty;
+    double inverseTangent = (Math.atan(Tangent));
+
+    SmartDashboard.putNumber("Degrees to Apirltag", inverseTangent);
+      }
+
+    
+      public Command getTelaopCommand(swerve_drive drive) {
     //return new NormalDrive(driveController, drive);
     return new RunCommand(() -> drive.drive(MathUtil.applyDeadband(MathUtil.clamp(driverController.getLeftY(), -0.5, 0.5),.1), MathUtil.applyDeadband(MathUtil.clamp(driverController.getLeftX(), -0.5, 0.5),.1), MathUtil.applyDeadband(MathUtil.clamp(driverController.getRightX(), -1, 1),.1)), drive);
   }
