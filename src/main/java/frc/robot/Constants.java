@@ -1,10 +1,15 @@
 package frc.robot;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveRequest.SwerveDriveBrake;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import frc.robot.Modules.MAXSwerveModule;
 
 public class Constants {
@@ -44,12 +49,46 @@ public class Constants {
         public static final SwerveDriveKinematics swerveKinematics = new SwerveDriveKinematics(
             Swerve_Drive_BL_Loc, Swerve_Drive_FL_Loc, Swerve_Drive_BR_Loc, Swerve_Drive_FR_Loc
             );
+        private static final SwerveModulePosition[] MOTOR_POSITIONS = new SwerveModulePosition[] {
+            SWERVE_MOTORS.Swerve_BL.getPosition(),
+            SWERVE_MOTORS.Swerve_FL.getPosition(),
+            SWERVE_MOTORS.Swerve_BR.getPosition(),
+            SWERVE_MOTORS.Swerve_FR.getPosition()
+        };
+        
     }
 
     public static final class gyro{
         private static final int PIGEON2_ID = 0;
 
         public static final Pigeon2 main_Gyro = new Pigeon2(PIGEON2_ID);
+    }
+
+    public static final class odometry{
+        public static final SwerveDriveOdometry swerve_Odemetry = new SwerveDriveOdometry(SWERVE_MOTORS.swerveKinematics, gyro.main_Gyro.getRotation2d(), SWERVE_MOTORS.MOTOR_POSITIONS);
+        
+        public static void updatePosition(){
+            swerve_Odemetry.update(
+                Rotation2d.fromDegrees(gyro.main_Gyro.getYaw().getValueAsDouble()),
+                new SwerveModulePosition[] {
+                    SWERVE_MOTORS.Swerve_BL.getPosition(),
+                    SWERVE_MOTORS.Swerve_FL.getPosition(),
+                    SWERVE_MOTORS.Swerve_BR.getPosition(),
+                    SWERVE_MOTORS.Swerve_FR.getPosition()
+                }
+                );
+        }
+        
+        ///Returns pose2d in meters reference
+        public static Pose2d getPosition(){
+            return swerve_Odemetry.getPoseMeters();
+        }
+
+        //Sets the robot pose to the desired pose
+        public static void setPosition(Pose2d newPose){
+            swerve_Odemetry.resetPosition(gyro.main_Gyro.getRotation2d(), SWERVE_MOTORS.MOTOR_POSITIONS, newPose);
+        }
+
     }
 
     public static final class ModuleConstants {
