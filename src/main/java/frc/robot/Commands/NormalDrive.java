@@ -16,6 +16,8 @@ public class NormalDrive extends Command {
     private static final double ROTATION_SCALE = 0.6;
     private static final double DEADBAND = 0.05;
 
+    private boolean doFieldRelativeDrive = true;
+
     public NormalDrive(XboxController driveController, swerve_drive drive) {
 
         this.driveController = driveController;
@@ -41,13 +43,12 @@ public class NormalDrive extends Command {
         curXSpeed = MathUtil.clamp(curXSpeed, -1.0, 1.0);
         curZSpeed = MathUtil.clamp(curZSpeed, -1.0, 1.0);
 
-
         double curRotAngle = wantedRotAngle;
-
-        System.out.println("CurX: " + curXSpeed + " | CurZ: " + curZSpeed + " | CurRot: " + curRotAngle);
-
-
-        drive.drive(curXSpeed, curZSpeed, curRotAngle);
+        if (doFieldRelativeDrive){
+            drive.drive(curXSpeed, curZSpeed, curRotAngle);
+        } else {
+            drive.absoluteDrive(curXSpeed, curZSpeed, curRotAngle);
+        }
     }
 
     @Override

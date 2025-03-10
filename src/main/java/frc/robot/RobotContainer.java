@@ -7,36 +7,27 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.motorcontrol.Talon;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Commands.LimeLIghtCommands;
 import frc.robot.Commands.Motor;
 import frc.robot.Libaries.LimelightHelpers;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import frc.robot.Commands.NormalDrive;
-import frc.robot.Subsystems.swerve_drive;
 
 public class RobotContainer  {
   
-  CommandXboxController driverController = new CommandXboxController(0);
-  swerve_drive drive;
   
-  public RobotContainer(swerve_drive drive) {
-    this.drive = drive;
+
+  public RobotContainer() {
     configureBindings();
     initSmartDashboard();
+    Constants.paths.Path_subsystem.setupAutoBuilder();
+    Constants.paths.Path_subsystem.setupDashboard();
   }
 
   private void configureBindings() {
@@ -46,21 +37,24 @@ public class RobotContainer  {
     TalonSRX talon = new TalonSRX(17);
     VictorSPX victor = new VictorSPX(0);
     victor.set(ControlMode.PercentOutput, 1);
-    driverController.a().onTrue(new Motor(end, orgin, talon));
-    //driverController.a().onTrue(new RunCommand(() -> System.out.println("A pressed"), Swerve_Drives()));
-  }
+    Constants.controllers.driveController.a().onTrue(new Motor(end, orgin, talon));
+    //Constants.controllers.driveController.a().onTrue(new RunCommand(() -> System.out.println("A pressed"), Swerve_Constants.subsystems.robotDrives()));
 
-  private void configureLimelight() {
-
+    Constants.controllers.driveController.start().onTrue(LimeLIghtCommands.estimatePoseFromLimelight);
+    Constants.controllers.driveController.leftBumper().onTrue(new InstantCommand(() -> Constants.subsystems.robotDrive.flipDrive()));
+    Constants.controllers.driveController.rightBumper().whileTrue(new RunCommand(() -> Constants.subsystems.robotDrive.brake()));
+    Constants.controllers.driveController.rightBumper().onFalse(new RunCommand(() -> Constants.subsystems.robotDrive.unbrake()));
   }
 
   private void initSmartDashboard(){
     SmartDashboard.putString("Test", "Some String Here");
     SmartDashboard.putNumber( "YUUU",1200);
+    //HttpCamera httpCamera = new HttpCamera("Limelight", "10.45.76.11:5800");
+    //Shuffleboard.getTab("Tab").add(httpCamera);
   }
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return Constants.paths.Path_subsystem.getPathFollowCommand();
   }
 
   public void getLimelightValues(){
@@ -69,8 +63,7 @@ public class RobotContainer  {
     SmartDashboard.putNumber("Area", LimelightHelpers.getTA("limelight"));
   }
 
-  public Command getTelaopCommand(swerve_drive drive) {
-    //return new NormalDrive(driveController, drive);
-    return new RunCommand(() -> drive.drive(MathUtil.applyDeadband(MathUtil.clamp(driverController.getLeftY(), -0.5, 0.5),.1), MathUtil.applyDeadband(MathUtil.clamp(driverController.getLeftX(), -0.5, 0.5),.1), MathUtil.applyDeadband(MathUtil.clamp(driverController.getRightX(), -1, 1),.1)), drive);
+  public Command getTelaopCommand() {
+    return new RunCommand(() -> Constants.subsystems.robotDrive.drive(MathUtil.applyDeadband(MathUtil.clamp(Constants.controllers.driveController.getLeftY(), -1, 1),.1), MathUtil.applyDeadband(MathUtil.clamp(Constants.controllers.driveController.getLeftX(), -1, 1),.1), MathUtil.applyDeadband(MathUtil.clamp(Constants.controllers.driveController.getRightX(), -1, 1),.1)), Constants.subsystems.robotDrive);
   }
 }

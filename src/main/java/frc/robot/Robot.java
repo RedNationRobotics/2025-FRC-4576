@@ -17,15 +17,7 @@ import frc.robot.Commands.Motor;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Subsystems.swerve_drive;
 
 public class Robot extends TimedRobot {
@@ -34,10 +26,8 @@ public class Robot extends TimedRobot {
 
   private final RobotContainer m_robotContainer;
 
-  private swerve_drive robot_drive = new swerve_drive();
-
   public Robot() {
-    m_robotContainer = new RobotContainer(robot_drive);
+    m_robotContainer = new RobotContainer();
 
     // This resets the motors to 0 (It should at least, not 100% sure yet)
     Constants.SWERVE_MOTORS.Swerve_BL.resetEncoders();
@@ -85,13 +75,14 @@ TalonSRX motor = new TalonSRX(17);
     }
 
 
-    m_teleopCommand = m_robotContainer.getTelaopCommand(robot_drive);
-    robot_drive.setDefaultCommand((m_teleopCommand));
-    XboxController c = new XboxController(0);
-    Trigger button = new Trigger(() -> c.getAButtonPressed());
+    m_teleopCommand = m_robotContainer.getTelaopCommand();
+    Constants.subsystems.robotDrive.setDefaultCommand((m_teleopCommand));
+    
+    //XboxController c = new XboxController(0);
+    //Trigger button = new Trigger(() -> Constants.controllers.driveController.getAButtonPressed());
     //SWERVE DRIVE WILL BE REPLACE WITH YOUR SUBSYSTEM :)
-    swerve_drive drive = new swerve_drive();
-    button.onTrue(new RunCommand(()-> motor.set(TalonSRXControlMode.PercentOutput, 1), drive));
+    //button.onTrue(new RunCommand(()-> motor.set(TalonSRXControlMode.PercentOutput, 1), drive));
+    //Constants.controllers.driveController.a().onTrue(new RunCommand(()-> motor.set(TalonSRXControlMode.PercentOutput, 1), drive));
   }
 
   @Override
