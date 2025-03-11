@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Commands.LimeLIghtCommands;
+import frc.robot.Libaries.LimelightHelpers;
 
 public class swerve_drive extends SubsystemBase{
     private boolean doFieldRelativeDrive = true;
@@ -89,10 +91,12 @@ public class swerve_drive extends SubsystemBase{
         SmartDashboard.putNumber("PoseX", Constants.odometry.getPosition().getX());
         SmartDashboard.putNumber("PoseY", Constants.odometry.getPosition().getY());
         SmartDashboard.putNumber("Rotation", Constants.gyro.main_Gyro.getRotation2d().getRadians());
-        // Do this in either robot or subsystem init
+        SmartDashboard.putNumber("LimelightID", LimelightHelpers.getFiducialID("limelight"));
+
         SmartDashboard.putData("Field", m_field);
         // Do this in either robot periodic or subsystem periodic
         m_field.setRobotPose(Constants.odometry.getPosition());
+        LimeLIghtCommands.doEstimatePoseByLimelight();
     }
 
     public void brake() {

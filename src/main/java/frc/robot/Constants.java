@@ -3,6 +3,9 @@ package frc.robot;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveRequest.SwerveDriveBrake;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -14,27 +17,45 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Commands.ElevatorCommands;
 import frc.robot.Modules.MAXSwerveModule;
 import frc.robot.Subsystems.pathPlanner;
 import frc.robot.Subsystems.swerve_drive;
+import frc.robot.Subsystems.trackSubsytem;
 
 public class Constants {
     
     public class subsystems {
         public static swerve_drive robotDrive = new swerve_drive();
+        public static pathPlanner Path_subsystem = new pathPlanner();
+        public static trackSubsytem verticalElevator = new trackSubsytem(0, 0, new SparkFlex(0, MotorType.kBrushless), new Encoder(null, null), new DigitalInput(0));
+        public static trackSubsytem horizontalElevator = new trackSubsytem(0, 0, new SparkFlex(0, MotorType.kBrushless), new Encoder(null, null), new DigitalInput(0));
+    }
+
+    public class intake {
+        public static SparkMax intakeMotor = new SparkMax(0, MotorType.kBrushless);
+    }
+
+    public class verticalElevator {
+        public static ElevatorCommands evCommands = new ElevatorCommands(Constants.subsystems.verticalElevator);
+    }
+
+    public class horizontalElevator {
+        public static ElevatorCommands evCommands = new ElevatorCommands(Constants.subsystems.horizontalElevator);
     }
 
     public class paths {
         public static SendableChooser<Command> autoChooser;
-
-        public static pathPlanner Path_subsystem = new pathPlanner();
     }
     
     public class controllers {
         public static CommandXboxController driveController = new CommandXboxController(0);
+        //public static CommandXboxController assistantController = new CommandXboxController(1);
     }
 
     public class SWERVE_MOTORS {

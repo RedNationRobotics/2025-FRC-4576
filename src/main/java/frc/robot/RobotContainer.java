@@ -14,8 +14,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.robot.Commands.ElevatorCommands;
 import frc.robot.Commands.LimeLIghtCommands;
 import frc.robot.Commands.Motor;
+import frc.robot.Constants.intake;
 import frc.robot.Libaries.LimelightHelpers;
 import edu.wpi.first.math.MathUtil;
 
@@ -26,8 +28,8 @@ public class RobotContainer  {
   public RobotContainer() {
     configureBindings();
     initSmartDashboard();
-    Constants.paths.Path_subsystem.setupAutoBuilder();
-    Constants.paths.Path_subsystem.setupDashboard();
+    Constants.subsystems.Path_subsystem.setupAutoBuilder();
+    Constants.subsystems.Path_subsystem.setupDashboard();
   }
 
   private void configureBindings() {
@@ -44,6 +46,29 @@ public class RobotContainer  {
     Constants.controllers.driveController.leftBumper().onTrue(new InstantCommand(() -> Constants.subsystems.robotDrive.flipDrive()));
     Constants.controllers.driveController.rightBumper().whileTrue(new RunCommand(() -> Constants.subsystems.robotDrive.brake()));
     Constants.controllers.driveController.rightBumper().onFalse(new RunCommand(() -> Constants.subsystems.robotDrive.unbrake()));
+
+    Constants.controllers.driveController.povRight().onTrue(Constants.subsystems.Path_subsystem.lineUpCommand(true));
+    Constants.controllers.driveController.povLeft().onTrue(Constants.subsystems.Path_subsystem.lineUpCommand(false));
+
+    //constants.controls.driveController.
+    Constants.controllers.driveController.rightTrigger().whileTrue(Constants.horizontalElevator.evCommands.elevatorUp);
+    Constants.controllers.driveController.leftTrigger().whileTrue(Constants.verticalElevator.evCommands.elevatorDown);
+
+    //Constants.controllers.assistantController.rightTrigger().whileTrue(new InstantCommand(()->{Constants.intake.intakeMotor.set(1);}));
+    //Constants.controllers.assistantController.leftTrigger().whileTrue(new InstantCommand(()->{Constants.intake.intakeMotor.set(-1);}));
+    
+    
+    //Constants.controllers.assistantController.rightTrigger().onFalse(
+    //  new InstantCommand(
+    //    //Modulo?
+    //    //Why no modulo to reset to 0?
+    //  ()->{
+    //    Constants.controllers.assistantController.leftBumper().getAsBoolean() ?
+    //    return : Constants.intake.intakeMotor.set(0);
+    //  })
+    //);
+    //ROBOT ELEVATOR POSITIONS
+    //Constants.controllers.assistantController.a().onTrue(Constants.subsystems.dri)
   }
 
   private void initSmartDashboard(){
@@ -54,7 +79,7 @@ public class RobotContainer  {
   }
 
   public Command getAutonomousCommand() {
-    return Constants.paths.Path_subsystem.getPathFollowCommand();
+    return Constants.subsystems.Path_subsystem.getPathFollowCommand();
   }
 
   public void getLimelightValues(){
