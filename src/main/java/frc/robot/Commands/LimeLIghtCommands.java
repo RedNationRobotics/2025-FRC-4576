@@ -15,7 +15,8 @@ public class LimeLIghtCommands {
 
     public static void doEstimatePoseByLimelight(){
         //if limelight not seeing target then return
-        if (LimelightHelpers.getTV("limelight") == false) return;
+        SmartDashboard.putBoolean("See target?", LimelightHelpers.getTV("limelight") == false);
+        //if (LimelightHelpers.getTV("limelight") == false) return;
         
         var alliance = DriverStation.getAlliance();
         if (!alliance.isPresent()) return;

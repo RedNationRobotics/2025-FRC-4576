@@ -7,6 +7,8 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,14 +36,6 @@ public class RobotContainer  {
 
   private void configureBindings() {
 
-    DigitalInput end = new DigitalInput(0);
-    DigitalInput orgin = new DigitalInput(1);
-    TalonSRX talon = new TalonSRX(17);
-    VictorSPX victor = new VictorSPX(0);
-    victor.set(ControlMode.PercentOutput, 1);
-    Constants.controllers.driveController.a().onTrue(new Motor(end, orgin, talon));
-    //Constants.controllers.driveController.a().onTrue(new RunCommand(() -> System.out.println("A pressed"), Swerve_Constants.subsystems.robotDrives()));
-
     Constants.controllers.driveController.start().onTrue(LimeLIghtCommands.estimatePoseFromLimelight);
     Constants.controllers.driveController.leftBumper().onTrue(new InstantCommand(() -> Constants.subsystems.robotDrive.flipDrive()));
     Constants.controllers.driveController.rightBumper().whileTrue(new RunCommand(() -> Constants.subsystems.robotDrive.brake()));
@@ -50,23 +44,38 @@ public class RobotContainer  {
     Constants.controllers.driveController.povRight().onTrue(Constants.subsystems.Path_subsystem.lineUpCommand(true));
     Constants.controllers.driveController.povLeft().onTrue(Constants.subsystems.Path_subsystem.lineUpCommand(false));
 
+
+    //SparkFlex ev = new SparkFlex(12, MotorType.kBrushless);
+    ElevatorCommands evCommands = new ElevatorCommands(Constants.verticalElevator.verticalElevator);
+
+    Constants.verticalElevator.verticalElevator.setDefaultCommand(
+      new RunCommand(
+      () -> {
+        Constants.verticalElevator.verticalElevator.drive(
+          -Constants.controllers.driveController.getLeftTriggerAxis()
+          +Constants.controllers.driveController.getRightTriggerAxis()
+        );
+      },
+      Constants.verticalElevator.verticalElevator
+      )
+    );
+
+    //Constants.controllers.driveController.rightTrigger().whileTrue(new RunCommand(()->{ev.set(.1);}, Constants.subsystems.Path_subsystem));
+    //Constants.controllers.driveController.rightTrigger().onFalse(new RunCommand(()->{ev.set(0);}, Constants.subsystems.Path_subsystem));
     //constants.controls.driveController.
-    Constants.controllers.driveController.rightTrigger().whileTrue(Constants.horizontalElevator.evCommands.elevatorUp);
-    Constants.controllers.driveController.leftTrigger().whileTrue(Constants.verticalElevator.evCommands.elevatorDown);
+    //Constants.controllers.driveController.rightTrigger().whileTrue(new InstantCommand(
+    //  () -> Constants.verticalElevator.verticalElevator.driveAbsoluteSpe+++ed(1)
+    //  , Constants.verticalElevator.verticalElevator
+    //));
+    //Constants.controllers.driveController.leftTrigger().whileTrue(evCommands.elevatorDown());
 
     //Constants.controllers.assistantController.rightTrigger().whileTrue(new InstantCommand(()->{Constants.intake.intakeMotor.set(1);}));
     //Constants.controllers.assistantController.leftTrigger().whileTrue(new InstantCommand(()->{Constants.intake.intakeMotor.set(-1);}));
     
-    
-    //Constants.controllers.assistantController.rightTrigger().onFalse(
-    //  new InstantCommand(
-    //    //Modulo?
-    //    //Why no modulo to reset to 0?
-    //  ()->{
-    //    Constants.controllers.assistantController.leftBumper().getAsBoolean() ?
-    //    return : Constants.intake.intakeMotor.set(0);
-    //  })
-    //);
+
+    //Constants.controllers.driveController.rightTrigger().onFalse(
+    //    evCommands.elvatorStop()
+    //  );
     //ROBOT ELEVATOR POSITIONS
     //Constants.controllers.assistantController.a().onTrue(Constants.subsystems.dri)
   }

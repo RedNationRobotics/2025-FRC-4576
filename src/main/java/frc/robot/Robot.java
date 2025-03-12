@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -14,10 +17,16 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Commands.Motor;
+import frc.robot.Modules.customEncoder;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj.motorcontrol.Talon;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.Subsystems.swerve_drive;
 
 public class Robot extends TimedRobot {
@@ -34,12 +43,15 @@ public class Robot extends TimedRobot {
     Constants.SWERVE_MOTORS.Swerve_FL.resetEncoders();
     Constants.SWERVE_MOTORS.Swerve_BR.resetEncoders();
     Constants.SWERVE_MOTORS.Swerve_FR.resetEncoders();
+    SmartDashboard.putNumber("motorSpeed", 0);
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     m_robotContainer.getLimelightValues();
+    SmartDashboard.putNumber("RIGHT TRIGGER", Constants.controllers.driveController.getRightTriggerAxis());
+    SmartDashboard.putBoolean("RIGHT TIGGER?", Constants.controllers.driveController.rightTrigger().getAsBoolean());
   }
 
   @Override
@@ -73,7 +85,6 @@ TalonSRX motor = new TalonSRX(17);
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
-
 
     m_teleopCommand = m_robotContainer.getTelaopCommand();
     Constants.subsystems.robotDrive.setDefaultCommand((m_teleopCommand));

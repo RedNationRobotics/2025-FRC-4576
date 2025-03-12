@@ -11,7 +11,9 @@ import com.revrobotics.spark.SparkFlex;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Modules.customEncoder;
 
 public class trackSubsytem extends SubsystemBase {
     private double currentLoc;
@@ -20,13 +22,13 @@ public class trackSubsytem extends SubsystemBase {
     private double maxLoc;
 
     private final SparkFlex elevatorController;
-    private final Encoder encoder;
+    private final customEncoder encoder;
     private final DigitalInput baseLimitSwitch;
 
-    public trackSubsytem(double maxSpeed, double maxDistance, SparkFlex elevatorController, Encoder encoder, DigitalInput baseLimitSwitch){
+    public trackSubsytem(double maxSpeed, double maxDistance, SparkFlex elevatorController, customEncoder encoder, DigitalInput baseLimitSwitch){
         //this.maxSpeed = maxSpeed;
         this.encoder = encoder;
-        currentLoc = encoder.getDistance();
+        currentLoc = encoder.getValue();
         desiredLoc = currentLoc;
         this.elevatorController = elevatorController;
         this.baseLimitSwitch = baseLimitSwitch;
@@ -38,15 +40,15 @@ public class trackSubsytem extends SubsystemBase {
     }
 
     public void drive(double speed){
-        if (isAtOrigin()){
-            currentLoc = 0;
-            stop();
-            return;
-        }
-        if (isTooCloseToBounds() || isAtPosition()){
-            stop();
-            return;
-        }
+        //if (isAtOrigin() && speed<0){
+        //    currentLoc = 0;
+        //    stop();
+        //    return;
+        //}
+        //if (isTooCloseToBounds() || isAtPosition()){
+        //    stop();
+        //    return;
+        //}
 
         //Maybe some sort of spark overflow control?
         elevatorController.set(speed);
@@ -61,11 +63,11 @@ public class trackSubsytem extends SubsystemBase {
     }
 
     public void stop(){
-        drive(0);
+        elevatorController.set(0);
     }
 
     public void driveToDesiredPosition(){
-        currentLoc = encoder.getDistance();
+        currentLoc = encoder.getValue();
         double diff = desiredLoc-currentLoc;
         drive(Math.min(diff, maxSpeed));
     }
@@ -80,6 +82,18 @@ public class trackSubsytem extends SubsystemBase {
 
     public boolean isTooCloseToBounds(){
         return (Math.abs(currentLoc - maxLoc)<.1);
+    }
+    
+    @Override
+    public void periodic() {
+        // TODO Auto-generated method stub
+        super.periodic();
+
+        SmartDashboard.putNumber("TRACK TRACK POSITION", encoder.getValue());
+        if (baseLimitSwitch.get() == false){
+            encoder.zero();
+            stop();
+        }
     }
 
 }

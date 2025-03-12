@@ -84,7 +84,7 @@ public class pathPlanner extends SubsystemBase{
   /// 
   public Command lineUpCommand(boolean lineRight){
     int targetID = 0; //Get limelight viewed id
-    targetID = LimelightHelpers.getFiducialID("limelight");
+    targetID = (int)LimelightHelpers.getFiducialID("limelight");
     //Instead of limelight, maybe get the closest pose?
     if (!targetToPose.containsKey(targetID)) return new Command(){};
     

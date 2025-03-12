@@ -18,12 +18,14 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Commands.ElevatorCommands;
 import frc.robot.Modules.MAXSwerveModule;
+import frc.robot.Modules.customEncoder;
 import frc.robot.Subsystems.pathPlanner;
 import frc.robot.Subsystems.swerve_drive;
 import frc.robot.Subsystems.trackSubsytem;
@@ -33,8 +35,7 @@ public class Constants {
     public class subsystems {
         public static swerve_drive robotDrive = new swerve_drive();
         public static pathPlanner Path_subsystem = new pathPlanner();
-        public static trackSubsytem verticalElevator = new trackSubsytem(0, 0, new SparkFlex(0, MotorType.kBrushless), new Encoder(null, null), new DigitalInput(0));
-        public static trackSubsytem horizontalElevator = new trackSubsytem(0, 0, new SparkFlex(0, MotorType.kBrushless), new Encoder(null, null), new DigitalInput(0));
+        //public static trackSubsytem horizontalElevator = new trackSubsytem(0, 0, new SparkFlex(0, MotorType.kBrushless), new Encoder(null, null), new DigitalInput(0));
     }
 
     public class intake {
@@ -42,11 +43,14 @@ public class Constants {
     }
 
     public class verticalElevator {
-        public static ElevatorCommands evCommands = new ElevatorCommands(Constants.subsystems.verticalElevator);
+        public static customEncoder verticalEncoder = new customEncoder(new DutyCycleEncoder(0));
+        public static SparkFlex verticalMotor = new SparkFlex(12, MotorType.kBrushless);
+        public static DigitalInput verticalBase = new DigitalInput(1);
+        public static trackSubsytem verticalElevator = new trackSubsytem(1, 3.5, Constants.verticalElevator.verticalMotor, Constants.verticalElevator.verticalEncoder, new DigitalInput(12));
     }
 
     public class horizontalElevator {
-        public static ElevatorCommands evCommands = new ElevatorCommands(Constants.subsystems.horizontalElevator);
+        //public static ElevatorCommands evCommands = new ElevatorCommands(Constants.subsystems.horizontalElevator);
     }
 
     public class paths {
@@ -59,20 +63,20 @@ public class Constants {
     }
 
     public class SWERVE_MOTORS {
-        public static final int Swerve_Drive_BL_ID = 5;
-        public static final int Swerve_Turn_BL_ID = 6;
+        public static final int Swerve_Drive_BL_ID = 3;
+        public static final int Swerve_Turn_BL_ID = 4;
         public static final double Swerve_BL_Rad = 0+(Math.PI);
 
-        public static final int Swerve_Drive_FL_ID = 3;
-        public static final int Swerve_Turn_FL_ID = 4;
+        public static final int Swerve_Drive_FL_ID = 7;
+        public static final int Swerve_Turn_FL_ID = 8;
         public static final double Swerve_FL_Rad = 1.57+(Math.PI); //* Math.PI;
 
-        public static final int Swerve_Drive_BR_ID = 7;
-        public static final int Swerve_Turn_BR_ID = 8;
+        public static final int Swerve_Drive_BR_ID = 1;
+        public static final int Swerve_Turn_BR_ID = 2;
         public static final double Swerve_BR_Rad = 4.71+(Math.PI); //* Math.PI;
 
-        public static final int Swerve_Drive_FR_ID = 1;
-        public static final int Swerve_Turn_FR_ID = 2;
+        public static final int Swerve_Drive_FR_ID = 5;
+        public static final int Swerve_Turn_FR_ID = 6;
         public static final double Swerve_FR_Rad = -3.14+(Math.PI); //* Math.PI;
 
         public static final MAXSwerveModule Swerve_BL = new MAXSwerveModule(Swerve_Drive_BL_ID, Swerve_Turn_BL_ID, Swerve_BL_Rad);
@@ -80,10 +84,10 @@ public class Constants {
         public static final MAXSwerveModule Swerve_BR = new MAXSwerveModule(Swerve_Drive_BR_ID, Swerve_Turn_BR_ID, Swerve_BR_Rad);
         public static final MAXSwerveModule Swerve_FR = new MAXSwerveModule(Swerve_Drive_FR_ID, Swerve_Turn_FR_ID, Swerve_FR_Rad);
 
-        public static final double maxSpeedMPS = 6.36;
+        public static final double maxSpeedMPS = 6.36*.1;
         public static final double maxAngularSpeed = .1 * Math.PI;
-        private static final double disX = 21.75/2;
-        private static final double disY = 29.75/2;
+        private static final double disX = 23.5/2;
+        private static final double disY = 27.5/2;
 
         // Constant for the positions of the Swerve Motors
         //public static final Translation2d Swerve_Drive_BL_Loc = new Translation2d(-disX, disY);
