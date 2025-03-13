@@ -4,23 +4,21 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Commands.ElevatorCommands;
 import frc.robot.Commands.LimeLIghtCommands;
-import frc.robot.Commands.Motor;
-import frc.robot.Constants.intake;
+import frc.robot.Commands.Limelight_LineupLeft_CMD;
+import frc.robot.Commands.Limelight_LineupRight_CMD;
+import frc.robot.Commands.PositionsListV;
 import frc.robot.Libaries.LimelightHelpers;
+import frc.robot.Subsystems.pathPlanner;
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
 import edu.wpi.first.math.MathUtil;
 
 public class RobotContainer  {
@@ -32,6 +30,10 @@ public class RobotContainer  {
     initSmartDashboard();
     Constants.subsystems.Path_subsystem.setupAutoBuilder();
     Constants.subsystems.Path_subsystem.setupDashboard();
+    
+    ElevatorCommands evHCommands = new ElevatorCommands(Constants.horizontalElevator.horizontalElevator);
+    HttpCamera limelightFeed = new HttpCamera("limelight", "http://10.45.76.11:5800/stream.mjpg", HttpCameraKind.kMJPGStreamer);
+    CameraServer.addCamera(limelightFeed);
   }
 
   private void configureBindings() {
@@ -44,40 +46,45 @@ public class RobotContainer  {
     Constants.controllers.driveController.povRight().onTrue(Constants.subsystems.Path_subsystem.lineUpCommand(true));
     Constants.controllers.driveController.povLeft().onTrue(Constants.subsystems.Path_subsystem.lineUpCommand(false));
 
+    pathPlanner bsSubsystem = new pathPlanner();
 
-    //SparkFlex ev = new SparkFlex(12, MotorType.kBrushless);
-    ElevatorCommands evCommands = new ElevatorCommands(Constants.verticalElevator.verticalElevator);
+    Constants.controllers.operatorController.povUp().onTrue(
+      new InstantCommand(() -> {PositionsListV.up();System.out.println("up");}, bsSubsystem)
+      );
+    Constants.controllers.operatorController.povDown().onTrue(
+      new InstantCommand(() -> {PositionsListV.down();}, bsSubsystem)
+      );
+    Constants.controllers.operatorController.a().onTrue(
+      (new InstantCommand(() -> {PositionsListV.setPosition();}, bsSubsystem))
+      );
 
-    Constants.verticalElevator.verticalElevator.setDefaultCommand(
-      new RunCommand(
-      () -> {
-        Constants.verticalElevator.verticalElevator.drive(
-          -Constants.controllers.driveController.getLeftTriggerAxis()
-          +Constants.controllers.driveController.getRightTriggerAxis()
-        );
-      },
-      Constants.verticalElevator.verticalElevator
-      )
-    );
-
-    //Constants.controllers.driveController.rightTrigger().whileTrue(new RunCommand(()->{ev.set(.1);}, Constants.subsystems.Path_subsystem));
-    //Constants.controllers.driveController.rightTrigger().onFalse(new RunCommand(()->{ev.set(0);}, Constants.subsystems.Path_subsystem));
-    //constants.controls.driveController.
-    //Constants.controllers.driveController.rightTrigger().whileTrue(new InstantCommand(
-    //  () -> Constants.verticalElevator.verticalElevator.driveAbsoluteSpe+++ed(1)
-    //  , Constants.verticalElevator.verticalElevator
-    //));
-    //Constants.controllers.driveController.leftTrigger().whileTrue(evCommands.elevatorDown());
-
-    //Constants.controllers.assistantController.rightTrigger().whileTrue(new InstantCommand(()->{Constants.intake.intakeMotor.set(1);}));
-    //Constants.controllers.assistantController.leftTrigger().whileTrue(new InstantCommand(()->{Constants.intake.intakeMotor.set(-1);}));
+    ElevatorCommands evVCommands = new ElevatorCommands(Constants.verticalElevator.verticalElevator);
+    Constants.verticalElevator.verticalElevator.setDefaultCommand(evVCommands.driveToPresetPosition);
     
+    ElevatorCommands evHCommands = new ElevatorCommands(Constants.horizontalElevator.horizontalElevator);
+    Constants.controllers.operatorController.x().onTrue(evHCommands.getSetPosCommand(2.0));
+    Constants.controllers.operatorController.y().onTrue(evHCommands.getSetPosCommand(1.0));
+    Constants.controllers.operatorController.b().onTrue(evHCommands.driveToOrigin);
 
-    //Constants.controllers.driveController.rightTrigger().onFalse(
-    //    evCommands.elvatorStop()
-    //  );
-    //ROBOT ELEVATOR POSITIONS
-    //Constants.controllers.assistantController.a().onTrue(Constants.subsystems.dri)
+    Constants.horizontalElevator.horizontalElevator.setDefaultCommand(evHCommands.driveToPresetPosition);
+
+    Constants.controllers.operatorController.rightBumper().whileFalse(new InstantCommand(
+      () -> {Constants.intake.intakeMotor.set(0);}, bsSubsystem
+    ));
+    Constants.controllers.operatorController.leftBumper().whileFalse(new InstantCommand(
+      () -> {Constants.intake.intakeMotor.set(0);}, bsSubsystem
+    ));
+    Constants.controllers.operatorController.rightBumper().whileTrue(new InstantCommand(
+      () -> {Constants.intake.intakeMotor.set(1);}, bsSubsystem
+    ));
+    Constants.controllers.operatorController.leftBumper().whileTrue(new InstantCommand(
+      () -> {Constants.intake.intakeMotor.set(-1);}, bsSubsystem
+    ));
+
+    Limelight_LineupRight_CMD right = new Limelight_LineupRight_CMD();
+    Limelight_LineupLeft_CMD left = new Limelight_LineupLeft_CMD();
+    Constants.controllers.driveController.povLeft().whileTrue(left);
+    Constants.controllers.driveController.povRight().whileTrue(right);
   }
 
   private void initSmartDashboard(){

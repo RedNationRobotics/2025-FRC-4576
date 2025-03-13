@@ -6,18 +6,10 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.Subsystems.trackSubsytem;
 
 public class ElevatorCommands {
-    trackSubsytem Elevator;
-    public Command pos1;
-    public Command pos2;
-    public Command pos3;
-    public Command pos4;
+    private trackSubsytem Elevator;
 
     public ElevatorCommands(trackSubsytem Elevator) {
         this.Elevator = Elevator;
-        pos1 = getMoveCommand(0d);
-        pos2 = getMoveCommand(0d);
-        pos3 = getMoveCommand(0d);
-        pos4 = getMoveCommand(0d);
 
         elevatorUp = 
         new InstantCommand(
@@ -33,7 +25,7 @@ public class ElevatorCommands {
 
         elevatorStop = 
         new RunCommand(
-            () -> {Elevator.drive(0);}
+            () -> {Elevator.stop();}
             , Elevator
         );
 
@@ -41,19 +33,18 @@ public class ElevatorCommands {
         driveToPresetPosition = new driveToPresetPosition(Elevator);
     }
 
-    public InstantCommand getMoveCommand(Double pos){
+    public InstantCommand getSetPosCommand(Double pos){
         return new InstantCommand(
-            () -> {Elevator.setDesiredPosition(pos);}
+            () -> {
+                Elevator.setDesiredPosition(pos);
+            }
             , Elevator
         );
     }
 
     public InstantCommand elevatorUp;
-
     public InstantCommand elevatorDown;
-
     public RunCommand elevatorStop;
-    
     public Command driveToOrigin;
     public Command driveToPresetPosition;
 

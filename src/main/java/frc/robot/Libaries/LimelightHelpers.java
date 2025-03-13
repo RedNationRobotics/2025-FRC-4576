@@ -7,6 +7,8 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
+import frc.robot.Libaries.LimelightHelpers.LimelightResults;
+import frc.robot.Libaries.LimelightHelpers.PoseEstimate;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -614,7 +616,7 @@ public class LimelightHelpers {
     static boolean profileJSON = false;
 
     static final String sanitizeName(String name) {
-        if ("".equals(name) || name == null) {
+        if (name == "" || name == null) {
             return "limelight";
         }
         return name;
@@ -1598,7 +1600,7 @@ public class LimelightHelpers {
         try {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
-            if (snapshotName != null && !"".equals(snapshotName)) {
+            if (snapshotName != null && snapshotName != "") {
                 connection.setRequestProperty("snapname", snapshotName);
             }
 

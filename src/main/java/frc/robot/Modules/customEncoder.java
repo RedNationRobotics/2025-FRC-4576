@@ -1,15 +1,13 @@
 package frc.robot.Modules;
 
-import com.revrobotics.spark.SparkFlex;
-
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class customEncoder extends SubsystemBase  {
-    double rotations;
+    public double rotations;
+    double negativeRotations;
     double negative;
-    double prevRotation;
+    public double prevRotation;
     DutyCycleEncoder encoder;
 
     public customEncoder(DutyCycleEncoder encoder){
@@ -35,7 +33,7 @@ public class customEncoder extends SubsystemBase  {
         if ((roughPrev>=8) && (roughDist<=2) ) {
             rotations+=1;
         }
-        prevRotation = encoder.get();
+        prevRotation = getRelVal();
     }
 
     public double getRot(){
@@ -43,16 +41,18 @@ public class customEncoder extends SubsystemBase  {
     }
 
     public void zero(){
+        negativeRotations = ((int) rotations);
         rotations = 0;
         negative = encoder.get();
+        prevRotation = getRelVal();
     }
 
     public double getRelVal(){
-        double value = encoder.get() + negative;
-        return value - (double)((int)value);
+        double value = encoder.get();
+        return value - ((int)value);
     }
 
     public double getValue(){
-        return rotations + encoder.get();
+        return (rotations - negativeRotations -negative + getRelVal());
     }
 }

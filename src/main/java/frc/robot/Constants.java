@@ -1,8 +1,6 @@
 package frc.robot;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveRequest.SwerveDriveBrake;
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -19,11 +17,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Commands.ElevatorCommands;
 import frc.robot.Modules.MAXSwerveModule;
 import frc.robot.Modules.customEncoder;
 import frc.robot.Subsystems.pathPlanner;
@@ -35,22 +31,24 @@ public class Constants {
     public class subsystems {
         public static swerve_drive robotDrive = new swerve_drive();
         public static pathPlanner Path_subsystem = new pathPlanner();
-        //public static trackSubsytem horizontalElevator = new trackSubsytem(0, 0, new SparkFlex(0, MotorType.kBrushless), new Encoder(null, null), new DigitalInput(0));
     }
 
     public class intake {
-        public static SparkMax intakeMotor = new SparkMax(0, MotorType.kBrushless);
+        public static SparkMax intakeMotor = new SparkMax(11, MotorType.kBrushless);
     }
 
     public class verticalElevator {
         public static customEncoder verticalEncoder = new customEncoder(new DutyCycleEncoder(0));
         public static SparkFlex verticalMotor = new SparkFlex(12, MotorType.kBrushless);
         public static DigitalInput verticalBase = new DigitalInput(1);
-        public static trackSubsytem verticalElevator = new trackSubsytem(1, 3.5, Constants.verticalElevator.verticalMotor, Constants.verticalElevator.verticalEncoder, new DigitalInput(12));
+        public static trackSubsytem verticalElevator = new trackSubsytem(.7, 2, Constants.verticalElevator.verticalMotor, Constants.verticalElevator.verticalEncoder, verticalBase, 0.06);//.06 hold speed for elevator
     }
 
     public class horizontalElevator {
-        //public static ElevatorCommands evCommands = new ElevatorCommands(Constants.subsystems.horizontalElevator);
+        public static customEncoder horizontalEncoder = new customEncoder(new DutyCycleEncoder(2));
+        public static SparkMax horizontalMotor = new SparkMax(10, MotorType.kBrushless);
+        public static DigitalInput horizontalBase = new DigitalInput(3);
+        public static trackSubsytem horizontalElevator = new trackSubsytem(.7, 2, Constants.horizontalElevator.horizontalMotor, Constants.horizontalElevator.horizontalEncoder, horizontalBase, 0);//0 hold speed for elevator
     }
 
     public class paths {
@@ -59,7 +57,7 @@ public class Constants {
     
     public class controllers {
         public static CommandXboxController driveController = new CommandXboxController(0);
-        //public static CommandXboxController assistantController = new CommandXboxController(1);
+        public static CommandXboxController operatorController = new CommandXboxController(1);
     }
 
     public class SWERVE_MOTORS {
@@ -84,7 +82,7 @@ public class Constants {
         public static final MAXSwerveModule Swerve_BR = new MAXSwerveModule(Swerve_Drive_BR_ID, Swerve_Turn_BR_ID, Swerve_BR_Rad);
         public static final MAXSwerveModule Swerve_FR = new MAXSwerveModule(Swerve_Drive_FR_ID, Swerve_Turn_FR_ID, Swerve_FR_Rad);
 
-        public static final double maxSpeedMPS = 6.36*.1;
+        public static final double maxSpeedMPS = 6.36;
         public static final double maxAngularSpeed = .1 * Math.PI;
         private static final double disX = 23.5/2;
         private static final double disY = 27.5/2;

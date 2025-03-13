@@ -7,20 +7,24 @@ public class driveToPresetPosition extends Command {
     private final trackSubsytem Elevator;
     public driveToPresetPosition(trackSubsytem Elevator){
         this.Elevator = Elevator;
+        this.addRequirements(Elevator);
     }
 
     @Override
     public void execute(){
         Elevator.driveToDesiredPosition();
+        if (isFinished()) end(false);
     }
 
     @Override
     public void end(boolean interrupted){
-        Elevator.drive(0);
+        Elevator.stop();
+        System.out.println("REACHED POSITION!");
     }
 
     @Override
     public boolean isFinished(){
+        System.out.println("I AM FINSIHED? " + Elevator.isAtPosition());
         return Elevator.isAtPosition();
     }
 
