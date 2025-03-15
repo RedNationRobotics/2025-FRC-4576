@@ -8,6 +8,7 @@ public class PositionsListV {
     public static int index = 0;
     public static ElevatorCommands evVCommands = new ElevatorCommands(Constants.verticalElevator.verticalElevator);
     public static String[] PosNames = new String[]{
+      "Zero",
       "Coral Station",
       "Algae 1",
       "Coral 1",
@@ -17,16 +18,18 @@ public class PositionsListV {
     };
 
     public static double[] poseHeights = new double[]{
-      .2,.83,1.34,2.68,3.15,6.1
+      0.01,.125,.83,1.75,2.68,3.4,6.15
     };
 
     public static Command[] TidePositions = new Command[]{
-      evVCommands.getSetPosCommand(.25),   //Coral Station
+      evVCommands.getSetPosCommand(0.01),  //Zero
+      evVCommands.getSetPosCommand(.125),   //Coral Station
       evVCommands.getSetPosCommand(.83),  //Algae 1
-      evVCommands.getSetPosCommand(1.5), //Coral 1
+      evVCommands.getSetPosCommand(1.75), //Coral 1
       evVCommands.getSetPosCommand(2.68), //Algae 2
-      evVCommands.getSetPosCommand(3.15), //Coral 2
-      evVCommands.getSetPosCommand(6.1)  //Coral 3
+      evVCommands.getSetPosCommand(3.4), //Coral 2
+      evVCommands.getSetPosCommand(6.15) //Coral 3
+
     };
 
     public static void setName(){

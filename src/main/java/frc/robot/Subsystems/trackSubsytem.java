@@ -8,10 +8,10 @@
 package frc.robot.Subsystems;
 
 import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkFlex;
+//import com.revrobotics.spark.SparkFlex;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Modules.customEncoder;
 
@@ -22,7 +22,7 @@ public class trackSubsytem extends SubsystemBase {
     private double maxLoc;
 
     private final SparkBase elevatorController;
-    private final customEncoder encoder;
+    public final customEncoder encoder;
     private final DigitalInput baseLimitSwitch;
 
     private static final double margin = .01;
@@ -116,8 +116,7 @@ public class trackSubsytem extends SubsystemBase {
         if (baseLimitSwitch.get() == false){
             encoder.zero();
             stop();
-        }
-        
-    }
 
-}
+        }
+        }
+    }

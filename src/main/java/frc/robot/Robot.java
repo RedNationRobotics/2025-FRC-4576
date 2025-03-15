@@ -19,15 +19,15 @@ public class Robot extends TimedRobot {
 
   public Robot() {
     m_robotContainer = new RobotContainer();
-
+    // This resets the motors to 0 (It should at least, not 100% sure yet)
     // This resets the motors to 0 (It should at least, not 100% sure yet)
     Constants.SWERVE_MOTORS.Swerve_BL.resetEncoders();
     Constants.SWERVE_MOTORS.Swerve_FL.resetEncoders();
     Constants.SWERVE_MOTORS.Swerve_BR.resetEncoders();
     Constants.SWERVE_MOTORS.Swerve_FR.resetEncoders();
     SmartDashboard.putNumber("motorSpeed", 0);
+    SmartDashboard.putData("Auto Chooser", Constants.paths.autoChooser);
   }
-
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();

@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -110,8 +111,11 @@ public class pathPlanner extends SubsystemBase{
     } catch (FileVersionException | IOException | ParseException e) {
       e.printStackTrace();
     }
+  
     return Constants.paths.autoChooser.getSelected();
   }
+    public static SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
+  
 
   public void setupDashboard(){
     
@@ -152,5 +156,6 @@ public class pathPlanner extends SubsystemBase{
       },
       this // Reference to this subsystem to set requirements
     );
-  }
+  
+}
 }
