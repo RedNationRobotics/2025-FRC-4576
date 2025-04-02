@@ -27,11 +27,6 @@ public class NormalDrive extends Command {
     }
 
     @Override
-    public void initialize() {
-        System.out.println("NormalDrive Command Initialized");
-    }
-
-    @Override
     public void execute() {
         double wantedSpeedX = -MathUtil.applyDeadband(driveController.getLeftY(), DEADBAND);
         double wantedSpeedZ = -MathUtil.applyDeadband(driveController.getLeftX(), DEADBAND);
@@ -58,7 +53,6 @@ public class NormalDrive extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("NormalDrive Command Ended");
         drive.drive(0, 0, 0);
     }
 }

@@ -5,10 +5,8 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -20,6 +18,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Commands.SmallDriveAdjustment;
 import frc.robot.Modules.MAXSwerveModule;
 import frc.robot.Modules.customEncoder;
 import frc.robot.Subsystems.pathPlanner;
@@ -31,6 +30,8 @@ public class Constants {
     public class subsystems {
         public static swerve_drive robotDrive = new swerve_drive();
         public static pathPlanner Path_subsystem = new pathPlanner();
+        public static SmallDriveAdjustment left = new SmallDriveAdjustment();
+        public static SmallDriveAdjustment right = new SmallDriveAdjustment();
     }
 
     public class intake {
@@ -41,14 +42,14 @@ public class Constants {
         public static customEncoder verticalEncoder = new customEncoder(new DutyCycleEncoder(0));
         public static SparkFlex verticalMotor = new SparkFlex(12, MotorType.kBrushless);
         public static DigitalInput verticalBase = new DigitalInput(1);
-        public static trackSubsytem verticalElevator = new trackSubsytem(.7, 2, Constants.verticalElevator.verticalMotor, Constants.verticalElevator.verticalEncoder, verticalBase, 0.06);//.06 hold speed for elevator
+        public static trackSubsytem verticalElevator = new trackSubsytem(1, 6.2, Constants.verticalElevator.verticalMotor, Constants.verticalElevator.verticalEncoder, verticalBase, 0.06);//.06 hold speed for elevator
     }
 
-    public class horizontalElevator {
+    public class  horizontalElevator {
         public static customEncoder horizontalEncoder = new customEncoder(new DutyCycleEncoder(2));
         public static SparkMax horizontalMotor = new SparkMax(10, MotorType.kBrushless);
         public static DigitalInput horizontalBase = new DigitalInput(3);
-        public static trackSubsytem horizontalElevator = new trackSubsytem(.7, 2, Constants.horizontalElevator.horizontalMotor, Constants.horizontalElevator.horizontalEncoder, horizontalBase, 0);//0 hold speed for elevator
+        public static trackSubsytem horizontalElevator = new trackSubsytem(1, 2, Constants.horizontalElevator.horizontalMotor, Constants.horizontalElevator.horizontalEncoder, horizontalBase, 0);//0 hold speed for elevator
     }
 
     public class paths {
@@ -83,7 +84,7 @@ public class Constants {
         public static final MAXSwerveModule Swerve_FR = new MAXSwerveModule(Swerve_Drive_FR_ID, Swerve_Turn_FR_ID, Swerve_FR_Rad);
 
         public static final double maxSpeedMPS = 6.36;
-        public static final double maxAngularSpeed = .1 * Math.PI;
+        public static final double maxAngularSpeed = .05*Math.PI;
         private static final double disX = 23.5/2;
         private static final double disY = 27.5/2;
 
@@ -134,7 +135,7 @@ public class Constants {
         
         public static void updatePosition(){
             swerve_Odemetry.update(
-                Rotation2d.fromDegrees(gyro.main_Gyro.getYaw().getValueAsDouble()),
+                gyro.main_Gyro.getRotation2d(),
                 Constants.SWERVE_MOTORS.MOTOR_POSITIONS()
                 );
         }

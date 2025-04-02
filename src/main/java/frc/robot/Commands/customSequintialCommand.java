@@ -15,7 +15,6 @@ public class customSequintialCommand extends Command {
 
     @Override
     public void execute() {
-        System.out.println("EXECUTING" + currentCommand.getName() + " " + currentCommand.isFinished());
         currentCommand.execute();
         if (currentCommand.isFinished()){
             end(false);

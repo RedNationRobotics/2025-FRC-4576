@@ -1,26 +1,23 @@
 package frc.robot.Subsystems;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.json.simple.parser.ParseException;
-
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
-import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
-import com.pathplanner.lib.util.FileVersionException;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.util.PixelFormat;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -104,21 +101,31 @@ public class pathPlanner extends SubsystemBase{
   }
 
   public Command getPathFollowCommand(){
-      
-    PathPlannerPath alignment = null;
-    try {
-      alignment = PathPlannerPath.fromPathFile("New Path");
-    } catch (FileVersionException | IOException | ParseException e) {
-      e.printStackTrace();
-    }
-  
     return Constants.paths.autoChooser.getSelected();
   }
-    public static SendableChooser<Command> autoChooser = AutoBuilder.buildAutoChooser();
-  
+
+  public Command goToPositionCommand(){
+    Pose2d target =  new Pose2d(
+      SmartDashboard.getNumber("END POINT X", 0), 
+      SmartDashboard.getNumber("END POINT Y", 0), 
+      Rotation2d.fromDegrees(SmartDashboard.getNumber("END POINT ROT", 0))
+      //Constants.gyro.main_Gyro.getRotation2d()
+      //Constants.odometry.getPosition().getRotation()
+      );
+    Command r = AutoBuilder.pathfindToPose(
+      target, 
+      new PathConstraints(.3, 1, .1, Units.degreesToRadians(0.1)),
+      0);
+    System.out.println(r.isFinished());
+    return r;
+  }
 
   public void setupDashboard(){
-    
+    UsbCamera c = CameraServer.startAutomaticCapture();
+    c.setVideoMode(PixelFormat.kMJPEG, 640, 480, 10);
+    CameraServer.addCamera(c);
+
+    SmartDashboard.putData(Constants.paths.autoChooser);
   }
 
   public void setupAutoBuilder(){
@@ -137,10 +144,11 @@ public class pathPlanner extends SubsystemBase{
       () -> {return Constants.odometry.getPosition();}, // Robot pose supplier
       (x) -> {Constants.odometry.setFullPosition(x);}, // Method to reset odometry (will be called if your auto has a starting pose)
       () -> {return Constants.odometry.botRelativeSpeeds();}, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-      (speeds, feedforwards) -> Constants.subsystems.robotDrive.absoluteDrive(-speeds.vxMetersPerSecond/Constants.SWERVE_MOTORS.maxSpeedMPS,-speeds.vyMetersPerSecond/Constants.SWERVE_MOTORS.maxSpeedMPS, speeds.omegaRadiansPerSecond/Constants.SWERVE_MOTORS.maxAngularSpeed), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+      //(speeds, feedforwards) -> Constants.subsystems.robotDrive.absoluteDrive(-speeds.vxMetersPerSecond/Constants.SWERVE_MOTORS.maxSpeedMPS,-speeds.vyMetersPerSecond/Constants.SWERVE_MOTORS.maxSpeedMPS, speeds.omegaRadiansPerSecond/Constants.SWERVE_MOTORS.maxAngularSpeed), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+      (speeds, feedforwards) -> {Constants.subsystems.robotDrive.autoDrive(speeds, feedforwards);}, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
       new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-              new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-              new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+              new PIDConstants(0, 0, 0), // Translation PID constants
+              new PIDConstants(1, 0, 0) // Rotation PID constants
       ),
       config, // The robot configuration
       () -> {
@@ -156,6 +164,6 @@ public class pathPlanner extends SubsystemBase{
       },
       this // Reference to this subsystem to set requirements
     );
-  
-}
+    Constants.paths.autoChooser = AutoBuilder.buildAutoChooser();
+  }
 }

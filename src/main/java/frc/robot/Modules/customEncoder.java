@@ -19,7 +19,6 @@ public class customEncoder extends SubsystemBase  {
 
     @Override
     public void periodic() {
-        // TODO Auto-generated method stub
         super.periodic();
         updateDistance();
     }

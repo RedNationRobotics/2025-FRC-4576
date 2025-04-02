@@ -1,5 +1,7 @@
 package frc.robot.Subsystems;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.DriveFeedforwards;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -68,28 +70,38 @@ public class swerve_drive extends SubsystemBase{
         //targetrotSpeed = Constants.SWERVE_MOTORS.accLimiter.calculate(targetrotSpeed);
 
         ChassisSpeeds SwerveMotorDesiredStates;
-        SwerveMotorDesiredStates = ChassisSpeeds.fromFieldRelativeSpeeds(-targetXSpeed, -targetZSpeed, -targetrotSpeed, Rotation2d.kZero);
+        SwerveMotorDesiredStates = ChassisSpeeds.fromRobotRelativeSpeeds(-targetXSpeed, -targetZSpeed, -targetrotSpeed, Rotation2d.kZero);
 
         SwerveModuleState[] desiredStates = Constants.SWERVE_MOTORS.swerveKinematics.toSwerveModuleStates(SwerveMotorDesiredStates);
 
         setSpeeds(desiredStates);
     }
+
+    public void autoDrive(ChassisSpeeds robotSpeeds, DriveFeedforwards optional){
+      //robotSpeeds.vxMetersPerSecond *=-1;  
+      //robotSpeeds.vyMetersPerSecond *=-1;  
+      //robotSpeeds.omegaRadiansPerSecond *=-1;  
+      robotSpeeds.omegaRadiansPerSecond *=0;  
+      SwerveModuleState[] desiredStates = Constants.SWERVE_MOTORS.swerveKinematics.toSwerveModuleStates(robotSpeeds);
+      setSpeeds(desiredStates);
+    }
     private final Field2d m_field = new Field2d();
         
     @Override
     public void periodic() {
-        // TODO Auto-generated method stub
         super.periodic();
         Constants.odometry.updatePosition();
 
         SmartDashboard.putNumber("PoseX", Constants.odometry.getPosition().getX());
         SmartDashboard.putNumber("PoseY", Constants.odometry.getPosition().getY());
-        SmartDashboard.putNumber("Rotation", Constants.gyro.main_Gyro.getRotation2d().getRadians());
+        SmartDashboard.putString("Rotation", Constants.gyro.main_Gyro.getRotation2d().toString());
         SmartDashboard.putNumber("LimelightID", LimelightHelpers.getFiducialID("limelight"));
+        SmartDashboard.putString("PATHPLANNER POSE", AutoBuilder.getCurrentPose().toString());
 
-        SmartDashboard.putData("Field", m_field);
         // Do this in either robot periodic or subsystem periodic
+
         m_field.setRobotPose(Constants.odometry.getPosition());
+        SmartDashboard.putData("Field", m_field);
         LimeLIghtCommands.doEstimatePoseByLimelight();
     }
 

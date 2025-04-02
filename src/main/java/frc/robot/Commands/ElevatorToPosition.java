@@ -1,18 +1,23 @@
 package frc.robot.Commands;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.trackSubsytem;
 
-public class driveToPresetPosition extends Command {
+public class ElevatorToPosition extends Command {
 
     private final trackSubsytem Elevator;
-    public driveToPresetPosition(trackSubsytem Elevator){
+    private final double targetPos;
+    public ElevatorToPosition(trackSubsytem Elevator, double pos){
         this.Elevator = Elevator;
         this.addRequirements(Elevator);
+        this.targetPos = pos;
     }
 
     @Override
     public void execute(){
-        Elevator.driveToDesiredPosition();
+        //Elevator.setDesiredPosition(targetPos);
+        //Elevator.driveToDesiredPosition();
+        Elevator.driveToPosition(targetPos);
         if (isFinished()) end(false);
     }
 
@@ -23,7 +28,7 @@ public class driveToPresetPosition extends Command {
 
     @Override
     public boolean isFinished(){
-        return Elevator.isAtPresetPosition();
-   }
+        return Elevator.isAtPosition(targetPos);
+    }
 
 }

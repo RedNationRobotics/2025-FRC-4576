@@ -8,6 +8,10 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.Commands.ElevatorCommands;
+import frc.robot.Commands.LimeLIghtCommands;
+import frc.robot.Commands.driveToOrigin;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
@@ -20,20 +24,16 @@ public class Robot extends TimedRobot {
   public Robot() {
     m_robotContainer = new RobotContainer();
     // This resets the motors to 0 (It should at least, not 100% sure yet)
-    // This resets the motors to 0 (It should at least, not 100% sure yet)
     Constants.SWERVE_MOTORS.Swerve_BL.resetEncoders();
     Constants.SWERVE_MOTORS.Swerve_FL.resetEncoders();
     Constants.SWERVE_MOTORS.Swerve_BR.resetEncoders();
     Constants.SWERVE_MOTORS.Swerve_FR.resetEncoders();
-    SmartDashboard.putNumber("motorSpeed", 0);
-    SmartDashboard.putData("Auto Chooser", Constants.paths.autoChooser);
+    Constants.gyro.main_Gyro.setYaw(0);
   }
+
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    m_robotContainer.getLimelightValues();
-    SmartDashboard.putNumber("RIGHT TRIGGER", Constants.controllers.driveController.getRightTriggerAxis());
-    SmartDashboard.putBoolean("RIGHT TIGGER?", Constants.controllers.driveController.rightTrigger().getAsBoolean());
   }
 
   @Override
@@ -47,7 +47,10 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+	CommandScheduler.getInstance().schedule(new driveToOrigin(Constants.horizontalElevator.horizontalElevator));
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+    LimeLIghtCommands.doPositioning = false;
+    Constants.subsystems.robotDrive.removeDefaultCommand();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
@@ -64,18 +67,14 @@ TalonSRX motor = new TalonSRX(17);
 
   @Override
   public void teleopInit() {
+    LimeLIghtCommands.doPositioning = true;
+    CommandScheduler.getInstance().schedule(new driveToOrigin(Constants.horizontalElevator.horizontalElevator));
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
 
     m_teleopCommand = m_robotContainer.getTelaopCommand();
     Constants.subsystems.robotDrive.setDefaultCommand((m_teleopCommand));
-    
-    //XboxController c = new XboxController(0);
-    //Trigger button = new Trigger(() -> Constants.controllers.driveController.getAButtonPressed());
-    //SWERVE DRIVE WILL BE REPLACE WITH YOUR SUBSYSTEM :)
-    //button.onTrue(new RunCommand(()-> motor.set(TalonSRXControlMode.PercentOutput, 1), drive));
-    //Constants.controllers.driveController.a().onTrue(new RunCommand(()-> motor.set(TalonSRXControlMode.PercentOutput, 1), drive));
   }
 
   @Override

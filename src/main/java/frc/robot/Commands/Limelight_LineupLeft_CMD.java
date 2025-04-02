@@ -14,14 +14,23 @@ public class Limelight_LineupLeft_CMD extends Command{
     
     @Override
     public void execute() {
-        if (LimelightHelpers.getTX("limelight") == 0) return;
-        LimelightHelpers.setFiducial3DOffset("limelight", 0, -.2, 0);
-        Double rot = 0d;
-        if (LimelightHelpers.getTX("limelight") > 0 ){
-            rot = LimelightHelpers.getTX("limelight")/(23*5);
-        } else if (LimelightHelpers.getTX("limelight") < 0 ){
-            rot = LimelightHelpers.getTX("limelight")/(23*5);
+        LimelightHelpers.setPipelineIndex("limelight", 1);
+        if (LimelightHelpers.getTX("limelight") == 0) 
+        {
+            Constants.subsystems.robotDrive.absoluteDrive(0,-.1, 0);
+            return;
         }
-        Constants.subsystems.robotDrive.drive(0, 0, rot);
+        double drive = 0;
+        //LimelightHelpers.setFiducial3DOffset("limelight", 0, -.2, 0);
+        Double rot = 0d;
+        if (LimelightHelpers.getTX("limelight") > 3 ){
+            rot = Math.signum(LimelightHelpers.getTX("limelight"));
+            drive = -1;
+        } else if (LimelightHelpers.getTX("limelight") < -3 ){
+            rot = Math.signum(LimelightHelpers.getTX("limelight"));
+            drive = 1;
+        }
+
+        Constants.subsystems.robotDrive.absoluteDrive(0,drive*.1, rot*.1);
     }
 }

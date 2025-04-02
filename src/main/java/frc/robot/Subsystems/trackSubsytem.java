@@ -8,10 +8,8 @@
 package frc.robot.Subsystems;
 
 import com.revrobotics.spark.SparkBase;
-//import com.revrobotics.spark.SparkFlex;
-
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
-//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Modules.customEncoder;
 
@@ -27,8 +25,6 @@ public class trackSubsytem extends SubsystemBase {
 
     private static final double margin = .01;
     private final double holdSpeed;
-    private double speed;
-    private double prevWorkingSpeed;
 
     public trackSubsytem(double maxSpeed, double maxDistance, SparkBase elevatorController, customEncoder encoder, DigitalInput baseLimitSwitch, double holdSpeed){
         this.maxSpeed = maxSpeed;
@@ -39,40 +35,40 @@ public class trackSubsytem extends SubsystemBase {
         this.baseLimitSwitch = baseLimitSwitch;
         this.maxLoc = maxDistance;
         this.holdSpeed = holdSpeed;
-        speed = 0;
-        prevWorkingSpeed = 1;
     }
 
     public void setDesiredPosition(double height){
         desiredLoc = height;
     }
 
-    public void drive(double speed){
+    public void drive(double speed, double target){
        if (isAtOrigin() && speed<0.0){
-            //System.out.println("AT ORIGIN");
             currentLoc = 0;
             stop();
             return;
         }
-        if (wouldBeTooCloseToBounds((Math.signum(speed)*.01)) || isAtPosition()){
-            //System.out.println("TOO CLOSE TO BOUNDS");
+        if (wouldBeTooCloseToBounds((Math.signum(speed)*.01)) || isAtPosition(target)){
             stop();
             return;
         }
-        if (speed != 0){
-            prevWorkingSpeed = speed;
-        }
         
-        double distToTarget = Math.abs(curDistanceToPoint(desiredLoc));
-        if (distToTarget<.5) speed *= (distToTarget *2);
-        speed = (distToTarget < .2 && distToTarget > 0) ? .2 * Math.signum(speed):speed; 
-        this.speed = speed;
-        //System.out.println("SPEED IS " + speed);
-        elevatorController.set((speed*maxSpeed)+holdSpeed);
+        double distToTarget = Math.abs(curDistanceToPoint(target));
+        if (distToTarget<.5) speed *= .5;
+        speed = (distToTarget < .2 && distToTarget > 0) ? .2 * Math.signum(speed) : speed;
+
+        double modifier = 1;
+        if (currentLoc < .5 && speed<0){
+            modifier = .2;
+        }
+        elevatorController.set(MathUtil.clamp(((speed * maxSpeed)+holdSpeed)* modifier,-.5,1.0));
     }
 
     public void driveAbsoluteSpeed(double dir){
-        elevatorController.set(dir * maxSpeed);
+        double modifier = 1;
+        if (currentLoc < .5 && dir<0){
+            modifier = .2;
+        }
+        elevatorController.set(dir * maxSpeed * modifier);
     }
 
     public void stop(){
@@ -81,15 +77,24 @@ public class trackSubsytem extends SubsystemBase {
 
     public void driveToDesiredPosition(){
         double diff = desiredLoc-currentLoc;
-        drive(Math.signum(diff)*Math.min(Math.abs(diff), 1.0));
+        drive(MathUtil.clamp(diff, -.5, 1.0), desiredLoc);
+    }
+
+    public void driveToPosition(double target){
+        double diff = target-currentLoc;
+        drive(MathUtil.clamp(diff, -.5, 1.0), target);
     }
 
     public boolean isAtOrigin(){
         return !baseLimitSwitch.get();
     }
     
-    public boolean isAtPosition(){
-        return (Math.abs(currentLoc - desiredLoc)<.09);
+    public boolean isAtPresetPosition(){
+        return isAtPosition(desiredLoc);
+    }
+
+    public boolean isAtPosition(double target){
+        return (Math.abs(currentLoc - target)<.09);
     }
 
     public boolean isTooCloseToBounds(){
@@ -110,13 +115,13 @@ public class trackSubsytem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // TODO Auto-generated method stub
         super.periodic();
         currentLoc = encoder.getValue();
         if (baseLimitSwitch.get() == false){
             encoder.zero();
             stop();
-
         }
-        }
+        
     }
+
+}
