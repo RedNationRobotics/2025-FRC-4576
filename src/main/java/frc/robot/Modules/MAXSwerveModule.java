@@ -58,10 +58,10 @@ public class MAXSwerveModule {
     // applying the configuration to bring the SPARK to a known good state. Persist
     // the settings to the SPARK to avoid losing them on a power cycle.
 
-    m_drivingSpark.configure(Configs.MAXSwerveModule.drivingConfig, ResetMode.kResetSafeParameters,
+    m_drivingSpark.configure(configs.MAXSwerveModule.drivingConfig, ResetMode.kResetSafeParameters,
     PersistMode.kPersistParameters);
 
-    m_turningSpark.configure(Configs.MAXSwerveModule.turningConfig, ResetMode.kResetSafeParameters,
+    m_turningSpark.configure(configs.MAXSwerveModule.turningConfig, ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
     m_chassisAngularOffset = chassisAngularOffset;
