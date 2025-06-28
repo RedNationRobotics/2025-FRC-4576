@@ -1,0 +1,61 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ZERO ELEVATORS"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left Start"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Coral 3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "OUT"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "STOPINTAKE"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BACK"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Coral Station"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
